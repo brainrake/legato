@@ -1,0 +1,26 @@
+{
+  "name": "legato",
+  "version": "0.0.0",
+  "description": "osc/midi hub",
+  "main": "legato.js",
+  "dependencies": {
+    "midi": "~0.6.0",
+    "omgosc": "~0.1.1",
+    "lodash": "~1.0.0-rc.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/eket/legato.git"
+  },
+  "keywords": [
+    "osc",
+    "midi"
+  ],
+  "author": "brainrape",
+  "license": "BSD",
+  "readmeFilename": "README.md"
+}
