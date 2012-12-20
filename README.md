@@ -9,23 +9,37 @@ Interfaces
 * volume control via `amixer`
 
 
-Usage
------
+Example Usage
+-------------
 
     L = require('./legato')
 
-    L.in '/midi/1': L.midi.in 1
-    L.in '/oscin': L.osc.in 7777
+    # inputs
+    L.in '/midi/1', L.midi.in 1
+    L.in '/oscin', L.osc.in 7777
 
-    oscout = L.osc.out '10.0.0.130', 7777
+    # outputs
+    volout = L.amixer 1, 'Master'
+    oscout = L.osc.out '192.168.1.13', 7777
 
-    L.throttle 50, i... for i in [
-      ['/midi/1/:/cc/12', -> L.amixer @val]
-      ['/oscin/1/fader:', -> L.amixer @val]
-    ]
-
-    L.on '/midi/1/:/cc/12', ->
+    # handlers
+    vol = L.throttle 50, ->
+      volout @val
       oscout '/1/fader1', @val
 
-    L.on '/midi/1/:/note/:', ->
-      console.log @path, @val
+    lofasz = -> exec 'mplayer /opt/lofasz.wav' if @val
+
+
+    # mapping
+
+    L.on '/midi/1/:/cc/12', vol
+    L.on '/oscin/:/fader:', vol
+
+    L.on p, lofasz for p in [
+     '/oscin/2/push1'
+     '/midi/1/:/note/70'
+    ]
+
+    #L.on '/midi/1/:/note/:', -> console.log @path, @val
+
+

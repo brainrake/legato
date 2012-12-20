@@ -2,8 +2,9 @@
   "name": "legato",
   "version": "0.0.0",
   "description": "osc/midi hub",
-  "main": "legato.js",
+  "main": "legato.coffee",
   "dependencies": {
+    "coffee-script": "*",
     "midi": "~0.6.0",
     "omgosc": "~0.1.1",
     "lodash": "~1.0.0-rc.2"
