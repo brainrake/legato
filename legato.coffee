@@ -1,5 +1,5 @@
 _ = require 'lodash'
-@___ = ___ = -> console.log '[legato]', arguments...
+@___ = ___ = -> console.log '[legato]', arguments...; arguments[0]
 
 @amixer = require('./amixer').amixer
 @midi = require('./midi')
@@ -13,7 +13,7 @@ router = (path_) ->
   #console.log 'router:', path_
   return (msg) ->
     for [path, cb] in routes
-      ctx =
+      ctx = 
         val: msg
         path: path_
       _(cb).bind(ctx)(msg) if path_.match path
