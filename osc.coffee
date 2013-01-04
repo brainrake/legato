@@ -2,7 +2,7 @@ ___ = require('./legato').___
 osc = require 'omgosc'
 
 @in = (port) ->
-  ___ '[in]', 'osc port=1'
+  ___ '[in]', 'osc port=#{port}'
   (router) ->
     receiver = new osc.UdpReceiver port
     receiver.on '', (e) ->
