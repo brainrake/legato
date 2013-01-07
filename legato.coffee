@@ -5,28 +5,37 @@ _ = require 'lodash'
 @midi = require('./midi')
 @osc = require('./osc')
 
-___ 'init'
+inputs = []
 
-routes = []
+routes = [] # [ [path, cb]* ]
 
-router = (path_) ->
-  #console.log 'router:', path_
-  return (msg) ->
-    for [path, cb] in routes
-      ctx = 
-        val: msg
-        path: path_
-      _(cb).bind(ctx)(msg) if path_.match path
+router = (path, val) ->
+  #___ '[in]', path, val
+  for [path_, cb] in routes
+    if path.match path_ 
+      ((_ cb).bind path:path, val:val) val 
+
+
+@init = =>
+  global.__legato?.close()
+  ___ 'init'
+  global.__legato = @ 
+
+@close = =>
+  ___ 'close'
+  i.close() for i in inputs
+  inputs.length = routes.length = 0
+  global.__legato = undefined
+
 
 @in = (prefix, input) ->
-  cb = (prefix) -> (path) -> router prefix+path
-  input cb prefix
-  ___ '[input]', prefix
+  inputs.push input (path, val) -> router prefix+path, val
+  ___ '[in+] ', prefix
 
 @on = (path, cb) ->
-  path = '^' + path.replace /\:([^\/]*)/g, '([^/]*)'
-  ___ '[route]', path
-  routes.push [path, cb]
+  path_ = '^' + path.replace /\:([^\/]*)/g, '([^/]*)'
+  ___ '[route+]', path, '  ->', path_
+  routes.push [path_, cb]
 
 @throttle = (delay, fn) =>
   _(fn).throttle(delay)

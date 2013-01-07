@@ -1,12 +1,12 @@
 {
   "name": "legato",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "osc/midi hub",
   "main": "legato.coffee",
   "dependencies": {
     "coffee-script": "*",
     "midi": "~0.6.0",
-    "omgosc": "~0.1.1",
+    "omgosc": "git://github.com/brainrape/omgosc.git",
     "lodash": "~1.0.0-rc.2"
   },
   "devDependencies": {},
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/eket/legato.git"
+    "url": "git://github.com/brainrape/legato.git"
   },
   "keywords": [
     "osc",
