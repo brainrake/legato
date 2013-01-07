@@ -31,14 +31,15 @@ To use it, just write a (really) small program that maps inputs to outputs.
 
 ### Usage
 
-`legato` can be installed using `npm`. It is suggested that the `coffee` binary be installed globally with `npm install -g coffee-script`.
+[node.js](http://nodejs.org/) is required. `legato` can be installed using `npm`. It is suggested that the `coffee` binary be installed globally with `npm install -g coffee-script`.
 
-To use `legato`, just require it from a node.js module. 
+Create a directory for your project and install legato as a dependency:
 
-    $ mkdir control; cd control          # create a directory for your project
-    $ npm install legato                 # install legato as a dependency 
+    $ mkdir control
+    $ cd control
+    $ npm install legato
 
-Create and edit a mapping file, e.g. `mapping.coffee`.
+Create and edit a mapping file, e.g. `mapping.coffee`. You can also use JS if you really want to.
 Here's an example:
 
     L = require('legato').init()
