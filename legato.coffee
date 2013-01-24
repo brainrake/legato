@@ -1,43 +1,33 @@
 _ = require 'lodash'
 @___ = ___ = -> console.log '[legato]', arguments...; arguments[0]
+@____ = (arg) -> -> ___ arg, arguments...; arguments[0]
+for lib in 'amixer midi osc firmata'.split ' '
+  @[lib] = require './'+lib
 
-@amixer = require('./amixer').amixer
-@midi = require('./midi')
-@osc = require('./osc')
+routes = []  # [ [path, cb]* ]
 
-inputs = []
-
-routes = [] # [ [path, cb]* ]
-
-router = (path, val) ->
-  #___ '[in]', path, val
+@dispatch = dispatch = (path, val) ->
   for [path_, cb] in routes
     if path.match path_ 
-      ((_ cb).bind path:path, val:val) val 
-
-
-@init = =>
-  global.__legato?.close()
-  ___ 'init'
-  global.__legato = @ 
-
-@close = =>
-  ___ 'close'
-  i.close() for i in inputs
-  inputs.length = routes.length = 0
-  global.__legato = undefined
-
+      (_.bind cb, path:path, val:val) val 
 
 @in = (prefix, input) ->
-  inputs.push input (path, val) -> router prefix+path, val
-  ___ '[in+] ', prefix
+  ___ 'in+ ', prefix
+  input (path, val) -> dispatch prefix+path, val
 
 @on = (path, cb) ->
-  path_ = '^' + path.replace /\:([^\/]*)/g, '([^/]*)'
-  ___ '[route+]', path, '  ->', path_
+  path_ = '^' + (path.replace /\:([^\/]*)/g, '([^/]*)') + '$'
+  ___ 'route+', path, '  ->', path_
   routes.push [path_, cb]
 
-@throttle = (delay, fn) =>
-  _(fn).throttle(delay)
+@throttle = (time, fn) -> _.throttle fn, time
+@delay = (time, fn) -> _.delay fn, time
 
-
+@closet = []
+@init = =>
+  global.__legato_deinit?()
+  global.__legato_deinit = =>
+    cb() for cb in @closet
+    @closet.length = routes.length = 0
+  ___ 'init'
+  @

@@ -1,15 +1,18 @@
 {
   "name": "legato",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "osc/midi hub",
   "main": "legato.coffee",
   "dependencies": {
     "coffee-script": "*",
+    "lodash": "~1.0.0-rc.3"
+  },
+  "devDependencies": {
     "midi": "~0.6.0",
     "omgosc": "git://github.com/brainrape/omgosc.git",
-    "lodash": "~1.0.0-rc.2"
+    "firmata": "git://github.com/louisremi/firmata.git",
+    "underscore.deferred": "0.4.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +25,6 @@
     "midi"
   ],
   "author": "brainrape",
-  "license": "BSD",
+  "license": "Public Domain",
   "readmeFilename": "README.md"
 }
