@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Legato by brainrape</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Legato</h1>
+        <p>OSC, MIDI, and more</p>
+
+        <p class="view"><a href="https://github.com/brainrape/legato">View the Project on GitHub <small>brainrape/legato</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/brainrape/legato/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/brainrape/legato/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/brainrape/legato">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h2>Why?</h2>
+
+<p>We live in a networked world. Although communication technology is built into most of our devices, it's still hard to get them to talk to eachother.</p>
+
+<p>This is unacceptable.</p>
+
+<p>Wether you want to control a live music performance using a MIDI controller and a rake or whatnot, or just turn on the coffee machine with a joystick, it should be easy.</p>
+
+<h2>How?</h2>
+
+<p>Different types of devices have different interfaces. For musical instrument controllers and digital audio software, there's <a href="http://en.wikipedia.org/wiki/Midi">MIDI</a>, and maybe <a href="http://en.wikipedia.org/wiki/Open_Sound_Control">OSC</a>. For lighting, there's <a href="http://en.wikipedia.org/wiki/DMX512">DMX</a>. But what if you want to control your music software with a gamepad or Wii Remote or your tablet's touchscreen? Or have some LEDs blink to the tempo? Or open the garage door with your phone?</p>
+
+<p>Maybe you've done a little research and tried the proprietary, paid, OSX-only <a href="http://www.osculator.net/">OSCulator</a> that constrains you to a GUI where each mapping has to be added manually, or the unmaintained <a href="http://glovepie.org/glovepie.php">GlovePIE</a> on Windows. Unsatisfactory. Maybe you've tried patching things together with graphical programming tools like <a href="http://puredata.info/">Pure Data</a> or <a href="http://cycling74.com/products/max/">Max/MSP</a>, but gave up after a few controls because there were too many boxes on the screen, and it couldn't be easily modified anyway. Or it dit sort of work, but you keep wishing there was an easier way.</p>
+
+<p>The solution is a unified interface to communicate with devices and software, and a simple way to route messages between them.</p>
+
+<p>Naturally, it should work across devices and networks.</p>
+
+<h2>What?</h2>
+
+<p><code>legato</code> is a small <code>node.js</code> library written in coffeescript, but that doesn't really matter. <code>legato</code> is designed to let you create beautifully simple connections between devices and software, regardless of environment.</p>
+
+<p>There is built-in support for OSC, MIDI, and some other stuff. It's easily extensible.</p>
+
+<p>To use it, just write a (really) small program that maps inputs to outputs.</p>
+
+<h3>Usage</h3>
+
+<p><a href="http://nodejs.org/">node.js</a> is required. <code>legato</code> can be installed using <code>npm</code>. It is suggested that the <code>coffee</code> binary be installed globally with <code>npm install -g coffee-script</code>.</p>
+
+<p>Create a directory for your project and install legato as a dependency:</p>
+
+<pre><code>$ mkdir control
+$ cd control
+$ npm install legato
+</code></pre>
+
+<p>Create and edit a mapping file, e.g. <code>mapping.coffee</code>. You can also use JS if you really want to.
+Here's an example:</p>
+
+<pre><code>L = require('legato').init()
+
+L.in '/midi1', L.midi.in 1  
+
+oscout = L.osc.out '192.168.1.255', 7778, broadcast: on 
+
+L.on '/midi1/1/cc/1', -&gt;             # listen for MIDI CC 1 on channel 1
+  console.log 'CC1', @val            # log the value
+
+L.on '/midi1/:/note/:', -&gt;           # listen for all MIDI notes on any channel
+  oscout @path, @val                 # forward them to OSC
+
+L.on '', -&gt; console.log @path, @val  # log all events
+</code></pre>
+
+<p><code>legato</code> is livecoding-friendly. Run your instance with coffeescript's 'watch' mode and watch it reload when you save the file.</p>
+
+<pre><code>$ coffee -w mapping.coffee
+</code></pre>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/brainrape">brainrape</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
