@@ -8,8 +8,8 @@ routes = []  # [ [path, cb]* ]
 
 @dispatch = dispatch = (path, val) ->
   for [path_, cb] in routes
-    if path.match path_ 
-      (_.bind cb, path:path, val:val) val 
+    if path.match path_
+      (_.bind cb, path:path, val:val) val
 
 @in = (prefix, input) ->
   ___ 'in+ ', prefix
