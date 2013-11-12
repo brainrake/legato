@@ -31,10 +31,10 @@ _ = require 'lodash'
 # Delay invocation of a callback.
 @delay = (time, fn) -> _.delay fn, time
 
-# Returns a list of the callbacks that should be called based on the path specified.
-# In other words, given the path '/input1/1/note/32', this method returns a list of
-# callbacks that need to be executed.
-# @param path {String} The path to test for matches.
+# Executes any callbacks that match the path specified.
+# In other words, given the path '/input1/1/note/32', this method will call any callbacks
+# that were registered to paths that match (such as '/input1/:/:/:').
+# @param path {String} The path to test for matches. See legato.on for more info.
 # @param val {int} The value of the event that triggered this dispatch.
 @dispatch = dispatch = (path, val) ->
   for [path_, cb] in routes
