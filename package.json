@@ -1,30 +1,26 @@
 {
   "name": "legato",
-  "version": "0.2.0",
+  "version": "0.2.1",
+  "main": "lib/legato.coffee",
   "description": "osc/midi hub",
-  "main": "legato.coffee",
-  "dependencies": {
-    "coffee-script": "*",
-    "lodash": "~1.0.0-rc.3"
-  },
-  "devDependencies": {
-    "midi": "~0.6.0",
-    "omgosc": "git://github.com/brainrape/omgosc.git",
-    "firmata": "git://github.com/louisremi/firmata.git",
-    "underscore.deferred": "0.4.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "homepage": "https://github.com/brainrape/legato",
+  "bugs": "https://github.com/brainrape/legato/issues",
+  "author": {
+    "name": "Boros Márton",
+    "email": ""
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/brainrape/legato.git"
   },
-  "keywords": [
-    "osc",
-    "midi"
-  ],
-  "author": "brainrape",
   "license": "Public Domain",
-  "readmeFilename": "README.md"
+  "devDependencies": {
+    "grunt-jasmine-node": "~0.1.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-coffeelint": "0.0.7",
+    "grunt-contrib-coffee": "~0.7.0"
+  },
+  "dependencies": {
+    "lodash": "~2.3.0"
+  }
 }
