@@ -1,7 +1,7 @@
 L = require './legato'; ___ = L.____ '[midi]'
 midi = require 'midi'
 
-parse = (port, msg) -> 
+parse = (port, msg) ->
   channel = msg[0] % 16 + 1
   switch msg[0] / 16  # message type
     when 0xB
@@ -12,7 +12,7 @@ parse = (port, msg) ->
       ["/#{channel}/note/#{msg[1]}", 0]
     when 0xE
       ["/#{channel}/pitchbend/", msg[1]/127.0]
-    else 
+    else
       ___ undefined, 'message:', msg...
       
 
@@ -20,7 +20,7 @@ parse = (port, msg) ->
   ___ "in#{port}#{virtual and 'v' or ''} open"
   midi_in = new midi.input()
   midi_in["open#{virtual and 'Virtual' or ''}Port"] port
-  midi_in.on 'message', (deltaTime, msg) -> 
+  midi_in.on 'message', (deltaTime, msg) ->
     router parse(port, msg)...
   L.closet.push ->  midi_in.closePort(); ___ 'in.close'
 
@@ -28,7 +28,7 @@ parse = (port, msg) ->
   ___ "[midi.out#{port}#{virtual and 'v' or ''}] open"
   midi_out = new midi.output()
   midi_out["open#{virtual and 'Virtual' or ''}Port"] port
-  midi_out.on 'message', (deltaTime, msg) -> 
+  midi_out.on 'message', (deltaTime, msg) ->
     router parse(port, msg)...
   L.closet.push -> midi_out.closePort(); ___ 'out.close'
 

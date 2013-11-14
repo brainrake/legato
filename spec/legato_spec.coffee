@@ -12,7 +12,7 @@ describe 'legato', ->
       console: console
       require: require
 
-    legato = sandbox 'lib/legato.js', boxGlobals
+    legato = sandbox 'lib/legato.coffee', boxGlobals
 
   beforeEach ->
     mock =

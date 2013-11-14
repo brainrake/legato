@@ -5,22 +5,34 @@
   "description": "osc/midi hub",
   "homepage": "https://github.com/brainrape/legato",
   "bugs": "https://github.com/brainrape/legato/issues",
-  "author": {
-    "name": "Boros Márton",
-    "email": ""
-  },
+  "keywords": [
+    "osc",
+    "midi"
+  ],
+  "author": "brainrape",
   "repository": {
     "type": "git",
     "url": "git://github.com/brainrape/legato.git"
   },
   "license": "Public Domain",
+  "readmeFilename": "README.md",
   "devDependencies": {
     "grunt-jasmine-node": "~0.1.0",
     "grunt-contrib-watch": "~0.5.3",
     "grunt-coffeelint": "0.0.7",
-    "grunt-contrib-coffee": "~0.7.0"
+    "grunt-contrib-coffee": "~0.7.0",
+    "load-grunt-tasks": "~0.2.0",
+    "grunt": "~0.4.1"
   },
   "dependencies": {
-    "lodash": "~2.3.0"
+    "lodash": "~2.3.0",
+    "midi": "~0.7.0",
+    "omgosc": "~1.0.0",
+    "firmata": "~0.3.0",
+    "underscore.deferred": "~0.4.0",
+    "coffee-script": "~1.6.3"
+  },
+  "scripts": {
+    "test": "grunt test"
   }
 }

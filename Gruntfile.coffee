@@ -17,6 +17,7 @@ module.exports = (grunt) ->
       projectRoot: "."
       requirejs: false
       forceExit: true
+      useCoffee: true
       extensions: 'coffee'
       jUnit:
         report: false
@@ -77,12 +78,11 @@ module.exports = (grunt) ->
           'jasmine_node'
         ]
 
-  grunt.loadNpmTasks('grunt-contrib-coffee')
-  grunt.loadNpmTasks('grunt-coffeelint')
-  grunt.loadNpmTasks('grunt-contrib-watch')
-  grunt.loadNpmTasks('grunt-jasmine-node')
+  require('load-grunt-tasks')(grunt)
 
   grunt.registerTask('unit-watch', ['watch:unit-watch'])
+
+  grunt.registerTask('test', ['jasmine_node'])
 
   grunt.registerTask('default', ['coffeelint', 'jasmine_node'])
 

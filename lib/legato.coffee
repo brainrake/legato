@@ -1,5 +1,6 @@
 'use strict'
 
+require 'coffee'
 _ = require 'lodash'
 
 # TODO Should we be defining the public methods on module.exports?
@@ -8,7 +9,6 @@ _ = require 'lodash'
 # Log a list of arguments to the console.
 @___ = ___ = -> console.log '[legato]', arguments...; arguments[0]
 
-# TODO Docs and testing
 @____ = (arg) -> -> ___ arg, arguments...; arguments[0]
 
 # A list of midi and osc routes with callbacks.
