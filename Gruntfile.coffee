@@ -25,33 +25,12 @@ module.exports = (grunt) ->
         useDotNotation: true
         consolidate: true
 
-    coffee:
-      options:
-        sourceMap: true
-        sourceRoot: ''
-      dist:
-        files: [
-          expand: true
-          cwd: '<%= yeoman.app %>'
-          src: '{,*/}*.coffee'
-          dest: '<%= yeoman.app %>'
-          ext: '.js'
-        ]
-      test:
-        files: [
-          expand: true
-          cwd: '<%= yeoman.test %>'
-          src: '{,*/}*.coffee'
-          dest: '<%= yeoman.test %>'
-          ext: '.js'
-        ]
-
     coffeelint:
       options: coffeelint
       gruntfile:
         files:
           src: ['Gruntfile.coffee']
-      dist:
+      lib:
         files:
           src: ['<%= yeoman.app %>/{,*/}*.coffee']
       test:
@@ -59,11 +38,10 @@ module.exports = (grunt) ->
           src: ['<%= yeoman.test %>/{,*/}*.coffee']
 
     watch:
-      dist:
+      lib:
         files: ['<%= yeoman.app %>/{,*/}*.coffee']
         tasks: [
-          'coffeelint:dist'
-          'coffee:dist'
+          'coffeelint:lib'
         ]
       'unit-watch':
         files: [
@@ -72,9 +50,7 @@ module.exports = (grunt) ->
         ]
         tasks: [
           'coffeelint:test'
-          'coffeelint:dist'
-          'coffee:test'
-          'coffee:dist'
+          'coffeelint:lib'
           'jasmine_node'
         ]
 

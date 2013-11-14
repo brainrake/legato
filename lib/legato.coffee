@@ -1,6 +1,5 @@
 'use strict'
 
-require 'coffee'
 _ = require 'lodash'
 
 # TODO Should we be defining the public methods on module.exports?

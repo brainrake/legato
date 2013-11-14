@@ -1,5 +1,4 @@
 node_modules
 .idea/
-lib/*.js
-spec/legato_spec.js
+**/*.js
 **/*.js.map
