@@ -10,9 +10,12 @@ _ = require 'lodash'
 
 @____ = (arg) -> -> ___ arg, arguments...; arguments[0]
 
+# Used to create unique ids for routes.
+routesCreated = 0
+
 # A list of midi and osc routes with callbacks.
 # TODO Make this private again?
-@routes = []
+@routes = {}
 
 # A list of callbacks used to close midi and osc listeners.
 # TODO Make this private?
@@ -36,7 +39,7 @@ _ = require 'lodash'
 # @param path {String} The path to test for matches. See legato.on for more info.
 # @param val {int} The value of the event that triggered this dispatch.
 @dispatch = dispatch = (path, val) ->
-  for [path_, cb] in routes
+  for id, [path_, cb] of routes
     if path.match path_
       (_.bind cb, path:path, val:val) val
     else
@@ -67,7 +70,14 @@ _ = require 'lodash'
 @on = (path, cb) ->
   path_ = '^' + (path.replace /\:([^\/]*)/g, '([^/]*)') + '$'
   ___ 'route+', path, '  ->', path_
-  routes.push [path_, cb]
+  routesCreated += 1
+  routes[routesCreated] = [path_, cb]
+  return routesCreated
+
+# Remove a route from legato.
+# @param id {number} The id of the route to remove (returned from the call to legato.on).
+@remove = (id) ->
+  delete routes[id]
 
 # Remove any registered midi and osc port listeners.
 # TODO Is it ok to remove this method from the global scope? Should I put it back in the global space
@@ -76,7 +86,8 @@ _ = require 'lodash'
   # Call each of the shutdown callbacks in the closet.
   cb() for cb in @closet
   # Reset both the closet and the routes.
-  @closet.length = routes.length = 0
+  @closet.length = 0
+  @routes = {}
 
 @init = ->
   @deinit()

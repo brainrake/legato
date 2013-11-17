@@ -45,7 +45,7 @@ describe 'legato', ->
     spyOn mock, 'otherCallback'
 
     expect(legato.closet.length).toBe 0, 'The closet should start out empty.'
-    expect(legato.routes.length).toBe 0, 'The routes should be cleared.'
+    expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
     legato.store mock.callback
     legato.store mock.otherCallback
@@ -55,14 +55,14 @@ describe 'legato', ->
     expect(mock.callback).toHaveBeenCalled()
     expect(mock.otherCallback).toHaveBeenCalled()
     expect(legato.closet.length).toBe 0, 'The closet should have been cleared.'
-    expect(legato.routes.length).toBe 0, 'The routes should be cleared.'
+    expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
   it 'should be possible to reinitialize legato', ->
     spyOn mock, 'callback'
     spyOn mock, 'otherCallback'
 
     expect(legato.closet.length).toBe 0, 'The closet should start empty.'
-    expect(legato.routes.length).toBe 0, 'The routes should be cleared.'
+    expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
     legato.store mock.callback
     legato.store mock.otherCallback
@@ -72,7 +72,7 @@ describe 'legato', ->
     expect(mock.otherCallback).toHaveBeenCalled()
     expect(legato.closet.length).toBe 0, 'The closet should have been emptied.'
     expect(returned).toBe legato, 'The legato object should be returned from init.'
-    expect(legato.routes.length).toBe 0, 'The routes should be cleared.'
+    expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
   it 'should provide access to the _.throttle method', ->
     spyOn _, 'throttle'
@@ -89,24 +89,27 @@ describe 'legato', ->
     expect(_.delay).toHaveBeenCalledWith mock.callback, 100
 
   it 'should be able to add new routes.', ->
-    expect(legato.routes.length).toBe 0, 'It should start without any routes.'
+    expect(Object.keys(legato.routes).length).toBe 0, 'It should start without any routes.'
 
-    legato.on '/input1/1/note/1', mock.callback
+    id = legato.on '/input1/1/note/1', mock.callback
 
     expect(console.log).toHaveBeenCalled()
-    expect(legato.routes.length).toBe 1, 'It should have added a new route.'
+    expect(Object.keys(legato.routes).length).toBe 1, 'It should have added a new route.'
+    expect(typeof id).toBe 'number', 'The id of the route should have been returned.'
+    expect(legato.routes[id][0]).toBe '^/input1/1/note/1$', 'The route pattern should be set.'
 
-    legato.on '/input1/2/note/2', mock.otherCallback
+    id2 = legato.on '/input1/2/note/2', mock.otherCallback
 
     expect(console.log.calls.length).toBe 2, 'It should have sent two log messages.'
-    expect(legato.routes.length).toBe 2, 'It should have added another route.'
+    expect(Object.keys(legato.routes).length).toBe 2, 'It should have added another route.'
+    expect(legato.routes[id2][0]).toBe '^/input1/2/note/2$', 'The route pattern should be set.'
 
   it 'should be able to create strict routes.', ->
-    legato.on '/input1/1/note/1', mock.callback
+    id = legato.on '/input1/1/note/1', mock.callback
 
-    route = legato.routes[0][0]
+    route = legato.routes[id][0]
 
-    expect(('/input1/1/note/1').match(legato.routes[0][0]).length)
+    expect(('/input1/1/note/1').match(route).length)
       .toBe 1, 'The path stored should match our route exactly.'
     expect(('/input1/1/note/12').match(route))
       .toBeNull 'The path should not match if the notes are different.'
@@ -118,9 +121,9 @@ describe 'legato', ->
       .toBeNull 'The path should not match if the note type is different.'
 
   it 'should be able to create routes to match any channel', ->
-    legato.on '/input1/:/note/1', mock.callback
+    id = legato.on '/input1/:/note/1', mock.callback
 
-    route = legato.routes[0][0]
+    route = legato.routes[id][0]
 
     expect(('/input1/1/note/1').match(route).length)
       .toBeGreaterThan 1, 'Events on channel one should match.'
@@ -132,12 +135,27 @@ describe 'legato', ->
       .toBeNull 'Events with different types should not match.'
 
   it 'should be able to create routes to match anything.', ->
-    legato.on '/:/:/:/:', mock.callback
+    id = legato.on '/:/:/:/:', mock.callback
 
-    route = legato.routes[0][0]
+    route = legato.routes[id][0]
 
     expect(('/input3/2/cc/7').match(route)).not.toBeNull 'Any input event should match.'
     expect(('/input1/1/note/1').match(route)).not.toBeNull 'Any input event should match.'
+
+  it 'should be possible to remove routes', ->
+    id1 = legato.on '/input1/1/note/1', mock.callback
+    id2 = legato.on '/input1/1/note/1', mock.otherCallback
+    id3 = legato.on '/input1/2/note/2', mock.callback
+    id4 = legato.on '/input3/1/note/1', mock.callback
+
+    expect(Object.keys(legato.routes).length).toBe 4, 'There should be 4 routes configured.'
+
+    legato.remove id2
+
+    expect(Object.keys(legato.routes).length).toBe 3, 'The second route should have been removed.'
+    expect(legato.routes[id2]).not.toBeDefined()
+    expect(legato.routes[id1]).toBeDefined()
+    expect(legato.routes[id1][1]).toBe mock.callback
 
   it 'should dispatch to the correct paths.', ->
     spyOn mock, 'callback'
