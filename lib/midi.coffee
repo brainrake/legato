@@ -14,15 +14,16 @@ parse = (port, msg) ->
       ["/#{channel}/pitchbend/", msg[1]/127.0]
     else
       ___ undefined, 'message:', msg...
-      
+
 
 @In = (port, virtual=no) -> (router) ->
   ___ "in#{port}#{virtual and 'v' or ''} open"
   midi_in = new midi.input()
+  # TODO Should we guard against opening virtual ports on systems that don't provide them?
   midi_in["open#{virtual and 'Virtual' or ''}Port"] port
   midi_in.on 'message', (deltaTime, msg) ->
     router parse(port, msg)...
-  L.closet.push ->  midi_in.closePort(); ___ 'in.close'
+  L.store ->  midi_in.closePort(); ___ 'in.close'
 
 @Out = (port, virtual=no) ->
   ___ "[midi.out#{port}#{virtual and 'v' or ''}] open"
@@ -30,7 +31,7 @@ parse = (port, msg) ->
   midi_out["open#{virtual and 'Virtual' or ''}Port"] port
   midi_out.on 'message', (deltaTime, msg) ->
     router parse(port, msg)...
-  L.closet.push -> midi_out.closePort(); ___ 'out.close'
+  L.store -> midi_out.closePort(); ___ 'out.close'
 
 @ins = ->
   midi_in = new midi.input()

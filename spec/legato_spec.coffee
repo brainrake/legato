@@ -23,9 +23,9 @@ describe 'legato', ->
       otherCallback: ->
         return 2
 
-  it 'should be able to write legato logs.', ->
-    spyOn(console, 'log')
+    spyOn console, 'log' # prevent logs
 
+  it 'should be able to write legato logs.', ->
     legato.___()
     expect(console.log).toHaveBeenCalledWith('[legato]')
 
@@ -58,7 +58,6 @@ describe 'legato', ->
     expect(legato.routes.length).toBe 0, 'The routes should be cleared.'
 
   it 'should be possible to reinitialize legato', ->
-    spyOn console, 'log' # prevent logs
     spyOn mock, 'callback'
     spyOn mock, 'otherCallback'
 
@@ -90,8 +89,6 @@ describe 'legato', ->
     expect(_.delay).toHaveBeenCalledWith mock.callback, 100
 
   it 'should be able to add new routes.', ->
-    spyOn console, 'log' # prevent logs
-
     expect(legato.routes.length).toBe 0, 'It should start without any routes.'
 
     legato.on '/input1/1/note/1', mock.callback
@@ -105,7 +102,6 @@ describe 'legato', ->
     expect(legato.routes.length).toBe 2, 'It should have added another route.'
 
   it 'should be able to create strict routes.', ->
-    spyOn(console, 'log') # prevent logs
     legato.on '/input1/1/note/1', mock.callback
 
     route = legato.routes[0][0]
@@ -122,7 +118,6 @@ describe 'legato', ->
       .toBeNull 'The path should not match if the note type is different.'
 
   it 'should be able to create routes to match any channel', ->
-    spyOn console, 'log' # prevent logs
     legato.on '/input1/:/note/1', mock.callback
 
     route = legato.routes[0][0]
@@ -137,7 +132,6 @@ describe 'legato', ->
       .toBeNull 'Events with different types should not match.'
 
   it 'should be able to create routes to match anything.', ->
-    spyOn console, 'log' # prevent logs
     legato.on '/:/:/:/:', mock.callback
 
     route = legato.routes[0][0]
@@ -146,7 +140,6 @@ describe 'legato', ->
     expect(('/input1/1/note/1').match(route)).not.toBeNull 'Any input event should match.'
 
   it 'should dispatch to the correct paths.', ->
-    spyOn console, 'log' # prevent logs
     spyOn mock, 'callback'
     spyOn mock, 'otherCallback'
 
@@ -165,7 +158,6 @@ describe 'legato', ->
     expect(mock.otherCallback).not.toHaveBeenCalled()
 
   it 'should allow registration of input ports.', ->
-    spyOn console, 'log' # prevent logs
     spyOn mock, 'callback'
     spyOn mock, 'otherCallback'
 

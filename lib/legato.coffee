@@ -70,7 +70,8 @@ _ = require 'lodash'
   routes.push [path_, cb]
 
 # Remove any registered midi and osc port listeners.
-# TODO Is it ok to remove this method from the global scope?
+# TODO Is it ok to remove this method from the global scope? Should I put it back in the global space
+# so we're not changing things unnecessarily?
 @deinit = ->
   # Call each of the shutdown callbacks in the closet.
   cb() for cb in @closet
