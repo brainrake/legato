@@ -10,6 +10,10 @@ _ = require 'lodash'
 
 @____ = (arg) -> -> ___ arg, arguments...; arguments[0]
 
+# Make all required libraries accessible from the legato object.
+for lib in 'amixer midi osc firmata'.split ' '
+  @[lib] = require './'+lib
+
 # Used to create unique ids for routes.
 routesCreated = 0
 

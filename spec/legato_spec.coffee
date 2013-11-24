@@ -12,7 +12,11 @@ describe 'legato', ->
   beforeEach ->
     boxGlobals =
       console: console
-      require: require
+      require: (lib) ->
+        if lib is 'lodash'
+          return _
+        else
+          return {}
 
     legato = sandbox 'lib/legato.coffee', boxGlobals
 

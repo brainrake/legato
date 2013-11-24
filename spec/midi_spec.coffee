@@ -6,6 +6,15 @@ describe 'legato.midi', ->
   legato = {}
   legatoMidi = {}
 
+  requireMock = (libName) ->
+    if(libName == 'midi')
+      return midiMock
+    if(libName == './legato')
+      return legato
+    else
+      return {}
+
+
   class MidiInputMock
     inputs: ['port1', 'port2']
     getPortCount: ->
@@ -68,19 +77,13 @@ describe 'legato.midi', ->
 
     legatoDependencies =
       console: console
-      require: require
+      require: requireMock
 
     legato = sandbox 'lib/legato.coffee', legatoDependencies
 
     legatoMidiDependencies =
       console: console
-      require: (libName) ->
-        if(libName == 'midi')
-          return midiMock
-        if(libName == './legato')
-          return legato
-        else
-          return require(libName)
+      require: requireMock
 
     legatoMidi = sandbox 'lib/midi.coffee', legatoMidiDependencies
 
