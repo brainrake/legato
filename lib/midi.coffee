@@ -24,28 +24,27 @@ parse = (port, msg) ->
 # open a new port as opposed to connecting to an existing port.
 # @return {Function} A function that can be called to start listening on this port.
 #     The returned function takes the following parameters.
-#     @param id {int} The id of the input. This will be used to store the shut down method.
 #     @param router {Function} The callback that will be called when new messages are received. This
 #         function is created by legato and will check all registered routes for matching paths.
+#     @return {Function} A function that should be called to close down this listener.
 @In = (port, virtual=no) ->
-  (id, router) ->
+  (router) ->
     ___ "in:#{port}#{virtual and 'v' or ''} open"
     midi_in = new midi.input()
     # TODO Should we guard against opening virtual ports on systems that don't provide them?
     midi_in["open#{virtual and 'Virtual' or ''}Port"] port
     midi_in.on 'message', (deltaTime, msg) ->
       router parse(port, msg)...
-    # TODO Could we remove the dependency on L by returning the callback and letting legato
-    # store it in the closet?
-    L.store id, ->  midi_in.closePort(); ___ 'in.close'
+    return ->  midi_in.closePort(); ___ 'in.close'
 
 @Out = (port, virtual=no) ->
   ___ "[midi.out#{port}#{virtual and 'v' or ''}] open"
   midi_out = new midi.output()
   midi_out["open#{virtual and 'Virtual' or ''}Port"] port
   midi_out.on 'message', (deltaTime, msg) ->
+    # TODO Test to make sure the router is being called.
     router parse(port, msg)...
-  L.store -> midi_out.closePort(); ___ 'out.close'
+  return L.store -> midi_out.closePort(); ___ 'out.close'
 
 @ins = ->
   midi_in = new midi.input()

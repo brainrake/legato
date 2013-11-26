@@ -27,16 +27,25 @@ inputsCreated = 0
 # TODO Make this private?
 @closet = {}
 
-# Store a shutdown callback to the closet for later cleanup of opened ports.
-# @param callback {Function} A function to execute when shutting down (or reinitializing) legato.
-@store = (id, callback) ->
-  @closet[id] = callback
-
 # Throttle the callback of a function.
 @throttle = (time, fn) -> _.throttle fn, time
 
 # Delay invocation of a callback.
 @delay = (time, fn) -> _.delay fn, time
+
+# Generates an unique id string.
+# @return a unique id.
+@generateId = ->
+  inputsCreated += 1
+  return "/#{inputsCreated}"
+
+# Store a shutdown callback to the closet for later cleanup of opened ports.
+# @param callback {Function} A function to execute when shutting down (or reinitializing) legato.
+# @param id {int} The id of the shutdown method. If an id is not passed, one will be generated.
+@store = (callback, id) ->
+  id = id ? generateId()
+  @closet[id] = callback
+  return id
 
 # Executes any callbacks that match the path specified.
 # In other words, given the path '/input1/1/note/32', this method will call any callbacks
@@ -55,15 +64,22 @@ inputsCreated = 0
 # under that name. For example, creating a midi input port requires the following:
 # legato.in( 'myMidiPortName', legato.midi.in( 1 ) )
 # When messages come in on midi port 1, they will match routes that begin with '/myMidiPortName'
-# @param prefix {String} The prefix to give this input.
+# @param prefix {String} (optional) The prefix to give this input.
 # @param input {Function} A function that takes a callback to be executed when events occur on this port.
 # @return {int} The id of the input created.
+# TODO Do we want to guard against reserved prefix that would mess with our routing (ie. '/:')?
 @in = (prefix, input) ->
+  id = @generateId()
+
+  if typeof(prefix) is 'function'
+    input = prefix
+    prefix = id
+
   ___ 'in+ ', prefix
-  inputsCreated += 1
-  input inputsCreated, (path, val) ->
+  shutdown = input (path, val) ->
     dispatch prefix+path, val
-  return inputsCreated
+  @store shutdown, id
+  return id
 
 # Setup a callback to be called based on the path passed.
 # @param path {String} The path to match against when input events occur.
@@ -89,10 +105,15 @@ inputsCreated = 0
 
 # Remove an input listener and any associated routes.
 # @param id {int} The id of the input to removed (returned from the call to legato.in).
-@removeInput = (id) ->
+# @param prefix {String} If a custom prefix was used to create this input and you wish to remove
+#     routes assocated with that prefix, pass the prefix as well. If the prefix is not removed,
+#     then routes associated to that prefix will remain (which may be desired in some cases).
+@removeInput = (id, prefix) ->
   for routeId, [route, cb] of @routes
-    if route.indexOf '/#{id}' is 0
-      @removeRoute (routeId)
+    if route.indexOf("^#{id}") is 0
+      @removeRoute routeId
+    if prefix? && route.indexOf("^#{prefix}") is 0
+      @removeRoute routeId
   delete closet[id]
 
 # Remove any registered midi and osc port listeners.

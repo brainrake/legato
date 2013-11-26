@@ -51,8 +51,8 @@ describe 'legato', ->
     expect(Object.keys(legato.closet).length).toBe 0, 'The closet should start out empty.'
     expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
-    legato.store 1, mock.callback
-    legato.store 2, mock.otherCallback
+    legato.store mock.callback, 0
+    legato.store mock.otherCallback, 1
     expect(Object.keys(legato.closet).length).toBe 2, 'The closet should have our callback.'
 
     legato.deinit()
@@ -68,8 +68,11 @@ describe 'legato', ->
     expect(Object.keys(legato.closet).length).toBe 0, 'The closet should start empty.'
     expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
-    legato.store 1, mock.callback
-    legato.store 2, mock.otherCallback
+    legato.store mock.callback, 0
+    legato.store mock.otherCallback, 1
+
+    expect(Object.keys(legato.closet).length).toBe 2, 'The closet should contain both callbacks.'
+
     returned = legato.init()
 
     expect(mock.callback).toHaveBeenCalled()
@@ -184,10 +187,9 @@ describe 'legato', ->
     spyOn mock, 'otherCallback'
 
     portMock =
-      onMessage: (id, cb) ->
+      onMessage: (cb) ->
         portMock.doStuff = cb
-        return legato.store id, ->
-          return true
+        return -> return true
 
     inputId = legato.in '/input1', portMock.onMessage
 
@@ -198,33 +200,76 @@ describe 'legato', ->
     legato.on '/input2/1/note/1', mock.otherCallback
 
     expect(mock.callback).not.toHaveBeenCalled()
-    expect(inputId).toBe 1, 'It should have returned the id of the input port created.'
+    expect(typeof(inputId)).toBe 'string', 'It should have returned the id of the input port created.'
 
     portMock.doStuff.apply portMock, ['/1/note/1', 10]
 
     expect(mock.callback.calls.length).toBe 3, 'Only the three matching callbacks should have been executed.'
     expect(mock.otherCallback).not.toHaveBeenCalled()
 
-  it 'should be possible to remove input ports.', ->
+  it 'should allow registration of input ports without a prefix.', ->
     spyOn mock, 'callback'
 
     portMock =
-      onMessage: (id, cb) ->
+      onMessage: (cb) ->
         portMock.doStuff = cb
-        return legato.store id, ->
-          return true
+        return -> return true
 
-    inputId = legato.in '/input1', portMock.onMessage
+    inputId = legato.in portMock.onMessage
 
-    legato.on '/:/:/:/:', mock.callback
+    legato.on "#{inputId}/:/:/:", mock.callback
 
-    portMock.doStuff.apply portMock, ['/1/note/1', 10]
-
-    expect(mock.callback.calls.length).toBe 1, 'The mock callback should have been called.'
-
-    legato.removeInput inputId
+    expect(mock.callback).not.toHaveBeenCalled()
 
     portMock.doStuff.apply portMock, ['/1/note/1', 10]
+
+    expect(mock.callback).toHaveBeenCalled()
+
+  it 'should be possible to remove input ports.', ->
+    spyOn mock, 'callback'
+    spyOn mock, 'otherCallback'
+
+    portMock1 =
+      onMessage: (cb) ->
+        portMock1.doStuff = cb
+        return -> return true
+
+    portMock2 =
+      onMessage: (cb) ->
+        portMock2.doStuff = cb
+        return -> return true
+
+    expect(Object.keys(legato.closet).length).toBe 0, 'The closet should start out empty.'
+
+    inputId1 = legato.in '/input1', portMock1.onMessage
+    legato.on "/input1/:/:/:", mock.callback
+    legato.on "/input1/1/note/:", mock.callback
+
+    expect(Object.keys(legato.closet).length).toBe 1, 'The closet should contain a shutdown method.'
+
+    inputId2 = legato.in portMock2.onMessage
+    legato.on "#{inputId2}/:/:/:", mock.otherCallback
+
+    expect(Object.keys(legato.closet).length).toBe 2, 'The second shutdown method should have been added.'
+
+    portMock1.doStuff.apply portMock1, ['/1/note/1', 10]
+
+    expect(mock.callback.calls.length).toBe 2, 'The mock callback should have been called.'
+
+    legato.removeInput inputId1, '/input1'
+
+    expect(Object.keys(legato.closet).length).toBe 1, 'Only one of the shutdown methods should remain.'
+    expect(Object.keys(legato.routes).length).toBe 1, 'The routes for input 2 should still remain.'
+
+    portMock1.doStuff.apply portMock1, ['/1/note/1', 10]
+    portMock2.doStuff.apply portMock2, ['/1/note/1', 10]
 
     expect(mock.callback.calls.length)
-      .toBe 1, 'The mock callback should not have been called after the input is removed.'
+      .toBe 2, 'The mock callback should not have been called after the input is removed.'
+    expect(mock.otherCallback.calls.length)
+      .toBe 1, 'The other mock callback should still be functioning.'
+
+    legato.removeInput inputId2
+
+    expect(Object.keys(legato.closet).length).toBe 0, 'There should not be any shutdown methods left.'
+    expect(Object.keys(legato.closet).length).toBe 0, 'All of the routes should have been removed.'
