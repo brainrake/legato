@@ -40,41 +40,41 @@ describe 'legato', ->
     expect(console.log.calls[2].args).toEqual(['[legato]','foo','bar',1,true,null])
 
   it 'should allow adding of callbacks to the closet', ->
-    expect(legato.closet.length).toBe 0, 'The closet should start out empty.'
+    expect(Object.keys(legato.closet).length).toBe 0, 'The closet should start out empty.'
     legato.store mock.callback
-    expect(legato.closet.length).toBe 1, 'The closet should have a callback in it.'
+    expect(Object.keys(legato.closet).length).toBe 1, 'The closet should have a callback in it.'
 
   it 'should call all of the closeted callbacks on deinit', ->
     spyOn mock, 'callback'
     spyOn mock, 'otherCallback'
 
-    expect(legato.closet.length).toBe 0, 'The closet should start out empty.'
+    expect(Object.keys(legato.closet).length).toBe 0, 'The closet should start out empty.'
     expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
-    legato.store mock.callback
-    legato.store mock.otherCallback
-    expect(legato.closet.length).toBe 2, 'The closet should have our callback.'
+    legato.store 1, mock.callback
+    legato.store 2, mock.otherCallback
+    expect(Object.keys(legato.closet).length).toBe 2, 'The closet should have our callback.'
 
     legato.deinit()
     expect(mock.callback).toHaveBeenCalled()
     expect(mock.otherCallback).toHaveBeenCalled()
-    expect(legato.closet.length).toBe 0, 'The closet should have been cleared.'
+    expect(Object.keys(legato.closet).length).toBe 0, 'The closet should have been cleared.'
     expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
   it 'should be possible to reinitialize legato', ->
     spyOn mock, 'callback'
     spyOn mock, 'otherCallback'
 
-    expect(legato.closet.length).toBe 0, 'The closet should start empty.'
+    expect(Object.keys(legato.closet).length).toBe 0, 'The closet should start empty.'
     expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
-    legato.store mock.callback
-    legato.store mock.otherCallback
+    legato.store 1, mock.callback
+    legato.store 2, mock.otherCallback
     returned = legato.init()
 
     expect(mock.callback).toHaveBeenCalled()
     expect(mock.otherCallback).toHaveBeenCalled()
-    expect(legato.closet.length).toBe 0, 'The closet should have been emptied.'
+    expect(Object.keys(legato.closet).length).toBe 0, 'The closet should have been emptied.'
     expect(returned).toBe legato, 'The legato object should be returned from init.'
     expect(Object.keys(legato.routes).length).toBe 0, 'The routes should be cleared.'
 
@@ -154,7 +154,7 @@ describe 'legato', ->
 
     expect(Object.keys(legato.routes).length).toBe 4, 'There should be 4 routes configured.'
 
-    legato.remove id2
+    legato.removeRoute (id2)
 
     expect(Object.keys(legato.routes).length).toBe 3, 'The second route should have been removed.'
     expect(legato.routes[id2]).not.toBeDefined()
@@ -184,11 +184,12 @@ describe 'legato', ->
     spyOn mock, 'otherCallback'
 
     portMock =
-      onMessage: (cb) ->
+      onMessage: (id, cb) ->
         portMock.doStuff = cb
-        return true
+        return legato.store id, ->
+          return true
 
-    legato.in '/input1', portMock.onMessage
+    inputId = legato.in '/input1', portMock.onMessage
 
     legato.on '/input1/1/note/1', mock.callback
     legato.on '/input1/:/note/1', mock.callback
@@ -197,8 +198,33 @@ describe 'legato', ->
     legato.on '/input2/1/note/1', mock.otherCallback
 
     expect(mock.callback).not.toHaveBeenCalled()
+    expect(inputId).toBe 1, 'It should have returned the id of the input port created.'
 
     portMock.doStuff.apply portMock, ['/1/note/1', 10]
 
     expect(mock.callback.calls.length).toBe 3, 'Only the three matching callbacks should have been executed.'
     expect(mock.otherCallback).not.toHaveBeenCalled()
+
+  it 'should be possible to remove input ports.', ->
+    spyOn mock, 'callback'
+
+    portMock =
+      onMessage: (id, cb) ->
+        portMock.doStuff = cb
+        return legato.store id, ->
+          return true
+
+    inputId = legato.in '/input1', portMock.onMessage
+
+    legato.on '/:/:/:/:', mock.callback
+
+    portMock.doStuff.apply portMock, ['/1/note/1', 10]
+
+    expect(mock.callback.calls.length).toBe 1, 'The mock callback should have been called.'
+
+    legato.removeInput inputId
+
+    portMock.doStuff.apply portMock, ['/1/note/1', 10]
+
+    expect(mock.callback.calls.length)
+      .toBe 1, 'The mock callback should not have been called after the input is removed.'

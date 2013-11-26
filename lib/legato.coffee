@@ -16,6 +16,8 @@ for lib in 'amixer midi osc firmata'.split ' '
 
 # Used to create unique ids for routes.
 routesCreated = 0
+# Used to create unique ids for inputs.
+inputsCreated = 0
 
 # A list of midi and osc routes with callbacks.
 # TODO Make this private again?
@@ -23,13 +25,12 @@ routesCreated = 0
 
 # A list of callbacks used to close midi and osc listeners.
 # TODO Make this private?
-@closet = []
+@closet = {}
 
 # Store a shutdown callback to the closet for later cleanup of opened ports.
 # @param callback {Function} A function to execute when shutting down (or reinitializing) legato.
-# TODO What's the correct way to specify javadocs in coffeescript?
-@store = (callback) ->
-  @closet.push(callback)
+@store = (id, callback) ->
+  @closet[id] = callback
 
 # Throttle the callback of a function.
 @throttle = (time, fn) -> _.throttle fn, time
@@ -56,10 +57,13 @@ routesCreated = 0
 # When messages come in on midi port 1, they will match routes that begin with '/myMidiPortName'
 # @param prefix {String} The prefix to give this input.
 # @param input {Function} A function that takes a callback to be executed when events occur on this port.
+# @return {int} The id of the input created.
 @in = (prefix, input) ->
   ___ 'in+ ', prefix
-  input (path, val) ->
+  inputsCreated += 1
+  input inputsCreated, (path, val) ->
     dispatch prefix+path, val
+  return inputsCreated
 
 # Setup a callback to be called based on the path passed.
 # @param path {String} The path to match against when input events occur.
@@ -80,17 +84,25 @@ routesCreated = 0
 
 # Remove a route from legato.
 # @param id {number} The id of the route to remove (returned from the call to legato.on).
-@remove = (id) ->
+@removeRoute = (id) ->
   delete routes[id]
+
+# Remove an input listener and any associated routes.
+# @param id {int} The id of the input to removed (returned from the call to legato.in).
+@removeInput = (id) ->
+  for routeId, [route, cb] of @routes
+    if route.indexOf '/#{id}' is 0
+      @removeRoute (routeId)
+  delete closet[id]
 
 # Remove any registered midi and osc port listeners.
 # TODO Is it ok to remove this method from the global scope? Should I put it back in the global space
 # so we're not changing things unnecessarily?
 @deinit = ->
   # Call each of the shutdown callbacks in the closet.
-  cb() for cb in @closet
+  cb() for prop, cb of @closet
   # Reset both the closet and the routes.
-  @closet.length = 0
+  @closet = {}
   @routes = {}
 
 @init = ->
