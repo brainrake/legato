@@ -21,7 +21,7 @@ inputsCreated = 0
 
 # A list of midi and osc routes with callbacks.
 # TODO Make this private again?
-@routes = {}
+@routes = routes = {}
 
 # A list of callbacks used to close midi and osc listeners.
 # TODO Make this private?
