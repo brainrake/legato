@@ -93,15 +93,15 @@ inputsCreated = 0
 # @param cb {Function} The callback function to execute when matching events occur.
 @on = (path, cb) ->
   path_ = '^' + (path.replace /\:([^\/]*)/g, '([^/]*)') + '$'
-  ___ 'route+ ', path, '  ->', path_
+  ___ 'route+ ', path, ' = ', path_
   routesCreated += 1
-  routes[routesCreated] = [path_, cb]
+  routes[routesCreated] = [path_, cb, path]
   return routesCreated
 
 # Remove a route from legato.
 # @param id {number} The id of the route to remove (returned from the call to legato.on).
 @removeRoute = (id) ->
-  ___ 'route- ', id
+  ___ 'route- ', id, routes[id][2]
   delete routes[id]
 
 # Remove an input listener and any associated routes.

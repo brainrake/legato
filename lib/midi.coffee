@@ -29,29 +29,30 @@ parse = (port, msg) ->
 #     @return {Function} A function that should be called to close down this listener.
 @In = (port, virtual=no) ->
   (router) ->
-    ___ "in:#{port}#{virtual and 'v' or ''} open"
+    ___ "in: #{port}#{virtual and 'v' or ''} open"
     midi_in = new midi.input()
     # TODO Should we guard against opening virtual ports on systems that don't provide them?
     midi_in["open#{virtual and 'Virtual' or ''}Port"] port
     midi_in.on 'message', (deltaTime, msg) ->
       router parse(port, msg)...
-    return ->  midi_in.closePort(); ___ 'in.close'
+    return -> midi_in.closePort(); ___ 'in:˘close'
 
 @Out = (port, virtual=no) ->
-  ___ "[midi.out#{port}#{virtual and 'v' or ''}] open"
+  ___ "out: #{port}#{virtual and 'v' or ''} open"
   midi_out = new midi.output()
   midi_out["open#{virtual and 'Virtual' or ''}Port"] port
   midi_out.on 'message', (deltaTime, msg) ->
-    # TODO Test to make sure the router is being called.
     router parse(port, msg)...
-  return L.store -> midi_out.closePort(); ___ 'out.close'
+  return L.store -> midi_out.closePort(); ___ 'out: close'
 
 @ins = ->
+  ___ "in: retrieving available ports."
   midi_in = new midi.input()
   for i in [0...midi_in.getPortCount()]
     midi_in.getPortName i
 
 @outs = ->
+  ___ "out: retrieving available ports."
   midi_out = new midi.output()
   for o in [0...midi_out.getPortCount()]
     midi_out.getPortName o
