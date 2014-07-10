@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "lodash": "~2.3.0",
-    "midi": "~0.7.0",
+    "midi": "~0.9.0",
     "omgosc": "~1.0.0",
     "firmata": "~0.3.0",
     "underscore.deferred": "~0.4.0",
