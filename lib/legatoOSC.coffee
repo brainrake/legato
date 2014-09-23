@@ -1,4 +1,7 @@
-L = require './legato'; ___ = L.____ '[osc]'
+# TODO pass in legatoUtils and OMGOSC
+
+utils = require './legatoUtils'
+___ = utils.____ '[osc]'
 osc = require 'omgosc'
 
 @In = (port) ->
@@ -12,6 +15,8 @@ osc = require 'omgosc'
 @Out = (host, port, opts={}) ->
   ___ "out #{host}:#{port}"
   sender = new osc.UdpSender host, port, opts
+  # can we store a shutdown function for this output and return the id in the closet and
+  # return the function to send a message.
   (path, val) ->  # send a float
     #___ "out #{host}:#{port}", path, val
     sender.send path, 'f', [val]

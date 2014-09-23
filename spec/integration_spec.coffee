@@ -10,6 +10,7 @@ rtMidiMock = {}
 legato = {}
 midi = {}
 midiLegatoMock = {}
+legatoUtils = {}
 
 describe 'integration', ->
 
@@ -23,6 +24,9 @@ describe 'integration', ->
 
     sandbox 'spec/rtMidiMock.coffee', rtMidiMockGlobals
     rtMidiMock = rtMidiMockGlobals.exports.rtMidiMock
+
+    legatoUtils = sandbox 'lib/legatoUtils.coffee', rtMidiMockGlobals
+    legatoUtils.init _
 
     midiLegatoMock =
       ____: -> ->
@@ -39,10 +43,12 @@ describe 'integration', ->
           return rtMidiMock
         else if lib is './legato'
           return midiLegatoMock
+        else if lib is './legatoUtils'
+          return legatoUtils
         else
           return {}
 
-    midi = sandbox 'lib/midi.coffee', legatoMidiGlobals
+    midi = sandbox 'lib/legatoMidi.coffee', legatoMidiGlobals
 
     legatoGlobals =
       console: console
@@ -51,8 +57,10 @@ describe 'integration', ->
           return _
         else if lib is 'midi'
           return rtMidiMock
-        else if lib is './midi'
+        else if lib is './legatoMidi'
           return midi
+        else if lib is './legatoUtils'
+          return legatoUtils
         else
           return {}
 
@@ -62,14 +70,14 @@ describe 'integration', ->
     spyOn(rtMidiMock, 'input').andCallThrough()
 
     wrapper = {}
-    wrapper.midiInputFunction = legato.midi.In 0
+    wrapper.midiInputFunction = midi.In 0
 
     expect(rtMidiMock.input).not.toHaveBeenCalled()
     expect(typeof(wrapper.midiInputFunction))
-      .toBe('function', 'legato.midi.In should return a function to be executed by legato.')
+      .toBe('function', 'legato.legatoMidi.In should return a function to be executed by legato.')
 
     spyOn(wrapper, 'midiInputFunction').andCallThrough()
-    spyOn(legato, 'store').andCallThrough()
+    spyOn(legatoUtils, 'store').andCallThrough()
 
     legato.in wrapper.midiInputFunction
 
@@ -77,14 +85,13 @@ describe 'integration', ->
     expect(rtMidiMock.input).toHaveBeenCalled()
     expect(rtMidiMock.inputs[0].openPort).toHaveBeenCalledWith 0
     expect(rtMidiMock.inputs[0].on).toHaveBeenCalled()
-    expect(legato.store).toHaveBeenCalled()
+    expect(legatoUtils.store).toHaveBeenCalled()
     # It should have acheived the above by calling the midiInputFunction we created with legato.midi.In
     expect(wrapper.midiInputFunction.calls.length).toBe(1)
     # The midi input function should have been passed a function to execute
     # when midi messages are received. That function will dispatch to any listeners added
     # with legato.on().
     expect(typeof(wrapper.midiInputFunction.calls[0].args[0])).toBe('function')
-    spyOn(midiLegatoMock, 'store').andCallThrough()
 
     wrapper.localCallback = ->
       console.log 'LOCAL CALLBACK'
@@ -106,3 +113,4 @@ describe 'integration', ->
     # Our local callback method should be called when the route matches.
     expect(wrapper.localCallback).toHaveBeenCalled()
     expect(wrapper.localCallback.calls[0].args[0]).toBeGreaterThan 0
+

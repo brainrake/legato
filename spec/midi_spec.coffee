@@ -6,12 +6,15 @@ rtMidiMock = {}
 describe 'legato.midi', ->
   legato = {}
   legatoMidi = {}
+  legatoUtils = {}
 
   requireMock = (libName) ->
     if(libName == 'midi')
       return rtMidiMock
     if(libName == './legato')
       return legato
+    if(libName == './legatoUtils')
+      return legatoUtils
     else
       return {}
 
@@ -28,8 +31,9 @@ describe 'legato.midi', ->
       console: console
       require: requireMock
 
+    legatoUtils = sandbox 'lib/legatoUtils.coffee', legatoDependencies
     legato = sandbox 'lib/legato.coffee', legatoDependencies
-    legatoMidi = sandbox 'lib/midi.coffee', legatoDependencies
+    legatoMidi = sandbox 'lib/legatoMidi.coffee', legatoDependencies
 
     spyOn console, 'log' # prevent logging
 
@@ -100,6 +104,6 @@ describe 'legato.midi', ->
 
     expect(rtMidiMock.outputs[0].closePort).not.toHaveBeenCalled()
 
-    legato.init()
+#    legato.init()
 
-    expect(rtMidiMock.outputs[0].closePort).toHaveBeenCalled()
+#    expect(rtMidiMock.outputs[0].closePort).toHaveBeenCalled()

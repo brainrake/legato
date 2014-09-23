@@ -1,6 +1,12 @@
 'user strict'
 
-L = require './legato'; ___ = L.____ '[midi]'
+# TODO Pass in logger and lodash dependencies
+# TODO Can we remove the legato.store reference? (create a closet class)
+# TODO Remove the logger requirements (pass in logger or duplicate code)
+
+L = require './legato'
+utils = require './legatoUtils'
+___ = utils.____ '[midi]'
 midi = require 'midi'
 
 parse = (port, msg) ->
@@ -41,6 +47,9 @@ parse = (port, msg) ->
   ___ "out: #{port}#{virtual and 'v' or ''} open"
   midi_out = new midi.output()
   midi_out["open#{virtual and 'Virtual' or ''}Port"] port
+  # can we store a shutdown function for this output and return the id in the closet and
+  # return the function to send a message.
+  # and why does this call the midi_out.on function?
   midi_out.on 'message', (deltaTime, msg) ->
     router parse(port, msg)...
   return L.store -> midi_out.closePort(); ___ 'out: close'

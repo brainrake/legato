@@ -1,23 +1,20 @@
 'use strict'
 
+# TODO Rename this file to router.coffee and pass in lodash, midi, osc, ...
+# TODO Create a wrapper to do the requires and pass the dependencies into the router
 _ = require 'lodash'
+utils = require './legatoUtils'
+utils.init(_)
 
-# TODO Should we be defining the public methods on module.exports?
-# Why does legato not do that?
-
-# Log a list of arguments to the console.
-@___ = ___ = -> console.log '[legato]', arguments...; arguments[0]
-
-@____ = (arg) -> -> ___ arg, arguments...; arguments[0]
-
+# TODO Provid access to these libs through the legato wrapper
 # Make all required libraries accessible from the legato object.
-for lib in 'amixer midi osc firmata'.split ' '
-  @[lib] = require './'+lib
+#for lib in 'amixer legatoMidi legatoOSC firmata'.split ' '
+#  @[lib] = require './'+lib
 
 # Used to create unique ids for routes.
 routesCreated = 0
 # Used to create unique ids for inputs.
-inputsCreated = 0
+#inputsCreated = 0
 
 # A list of midi and osc routes with callbacks.
 # TODO Make this private again?
@@ -25,27 +22,27 @@ inputsCreated = 0
 
 # A list of callbacks used to close midi and osc listeners.
 # TODO Make this private?
-@closet = {}
-
-# Throttle the callback of a function.
-@throttle = (time, fn) -> _.throttle fn, time
-
-# Delay invocation of a callback.
-@delay = (time, fn) -> _.delay fn, time
+#@closet = {}
+#
+## Throttle the callback of a function.
+#@throttle = (time, fn) -> _.throttle fn, time
+#
+## Delay invocation of a callback.
+#@delay = (time, fn) -> _.delay fn, time
 
 # Generates an unique id string.
 # @return a unique id.
-@generateId = ->
-  inputsCreated += 1
-  return "/#{inputsCreated}"
+#@generateId = ->
+#  inputsCreated += 1
+#  return "/#{inputsCreated}"
 
 # Store a shutdown callback to the closet for later cleanup of opened ports.
 # @param callback {Function} A function to execute when shutting down (or reinitializing) legato.
 # @param id {int} The id of the shutdown method. If an id is not passed, one will be generated.
-@store = (callback, id) ->
-  id = id ? generateId()
-  @closet[id] = callback
-  return id
+#@store = (callback, id) ->
+#  id = id ? generateId()
+#  @closet[id] = callback
+#  return id
 
 # Executes any callbacks that match the path specified.
 # In other words, given the path '/input1/1/note/32', this method will call any callbacks
@@ -69,13 +66,13 @@ inputsCreated = 0
 # @return {int} The id of the input created.
 # TODO Do we want to guard against reserved prefix that would mess with our routing (ie. '/:')?
 @in = (prefix, input) ->
-  id = @generateId()
+  id = utils.generateId()
 
   if typeof(prefix) is 'function'
     input = prefix
     prefix = id
 
-  ___ 'in+ ', prefix
+  utils.___ 'in+ ', prefix
   shutdown = input (path, val) ->
     dispatch prefix+path, val
   @store shutdown, id
@@ -93,7 +90,7 @@ inputsCreated = 0
 # @param cb {Function} The callback function to execute when matching events occur.
 @on = (path, cb) ->
   path_ = '^' + (path.replace /\:([^\/]*)/g, '([^/]*)') + '$'
-  ___ 'route+ ', path, ' = ', path_
+  utils.___ 'route+ ', path, ' = ', path_
   routesCreated += 1
   routes[routesCreated] = [path_, cb, path]
   return routesCreated
@@ -101,7 +98,7 @@ inputsCreated = 0
 # Remove a route from legato.
 # @param id {number} The id of the route to remove (returned from the call to legato.on).
 @removeRoute = (id) ->
-  ___ 'route- ', id, routes[id][2]
+  utils.___ 'route- ', id, routes[id][2]
   delete routes[id]
 
 # Remove an input listener and any associated routes.
@@ -110,25 +107,26 @@ inputsCreated = 0
 #     routes assocated with that prefix, pass the prefix as well. If the prefix is not removed,
 #     then routes associated to that prefix will remain (which may be desired in some cases).
 @removeInput = (id, prefix) ->
-  ___ 'in- ', id, prefix
+  utils.___ 'in- ', id, prefix
   for routeId, [route, cb] of @routes
     if route.indexOf("^#{id}") is 0
       @removeRoute routeId
     if prefix? && route.indexOf("^#{prefix}") is 0
       @removeRoute routeId
-  delete closet[id]
+  # TODO call the shutdown mentod for this input.
+  utils.remove id
 
 # Remove any registered midi and osc port listeners.
 # TODO Is it ok to remove this method from the global scope? Should I put it back in the global space
 # so we're not changing things unnecessarily?
 @deinit = ->
   # Call each of the shutdown callbacks in the closet.
-  cb() for prop, cb of @closet
+  utils.callAll()
   # Reset both the closet and the routes.
-  @closet = {}
+  utils.clear()
   @routes = {}
 
 @init = ->
   @deinit()
-  ___ 'init'
+  utils.___ 'init'
   return this
