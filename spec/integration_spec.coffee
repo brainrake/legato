@@ -1,14 +1,13 @@
 'use strict'
 
-# TODO Integrate with Travis?
-# TODO Add support for ddescribe and iit to jasmine-node?
-
 sandbox = require('./utils').sandbox
 _ = require 'lodash'
 
 rtMidiMock = {}
+omgosc = {}
 legato = {}
 midi = {}
+legatoOSC = {}
 midiLegatoMock = {}
 legatoUtils = {}
 
@@ -16,6 +15,26 @@ describe 'integration', ->
 
   beforeEach ->
     spyOn console, 'log' # prevent logs
+
+    localRequire = (lib) ->
+      if lib is 'lodash'
+        return _
+      else if lib is 'midi'
+        return rtMidiMock
+      else if lib is 'omgosc'
+        return omgosc
+      else if lib is './legato'
+        return midiLegatoMock
+      else if lib is './legatoUtils'
+        return legatoUtils
+      else if lib is './legatoRouter'
+        return legatoRouter
+      else if lib is './legatoMidi'
+        return midi
+      else if lib is './legatoOSC'
+        return legatoOSC
+      else
+        return {}
 
     rtMidiMockGlobals =
       console: console
@@ -25,8 +44,11 @@ describe 'integration', ->
     sandbox 'spec/rtMidiMock.coffee', rtMidiMockGlobals
     rtMidiMock = rtMidiMockGlobals.exports.rtMidiMock
 
-    legatoUtils = sandbox 'lib/legatoUtils.coffee', rtMidiMockGlobals
-    legatoUtils.init _
+    legatoUtils = sandbox 'lib/legatoUtils.coffee',
+      console: console
+
+    legatoRouter = sandbox 'lib/legatoRouter.coffee',
+      console: console
 
     midiLegatoMock =
       ____: -> ->
@@ -34,37 +56,17 @@ describe 'integration', ->
       store: ->
         return true
 
-    legatoMidiGlobals =
+    midi = sandbox 'lib/legatoMidi.coffee',
       console: console
-      require: (lib) ->
-        if lib is 'lodash'
-          return _
-        else if lib is 'midi'
-          return rtMidiMock
-        else if lib is './legato'
-          return midiLegatoMock
-        else if lib is './legatoUtils'
-          return legatoUtils
-        else
-          return {}
+      require: localRequire
 
-    midi = sandbox 'lib/legatoMidi.coffee', legatoMidiGlobals
-
-    legatoGlobals =
+    legatoOSC = sandbox 'lib/legatoOSC.coffee',
       console: console
-      require: (lib) ->
-        if lib is 'lodash'
-          return _
-        else if lib is 'midi'
-          return rtMidiMock
-        else if lib is './legatoMidi'
-          return midi
-        else if lib is './legatoUtils'
-          return legatoUtils
-        else
-          return {}
+      require: localRequire
 
-    legato = sandbox 'lib/legato.coffee', legatoGlobals
+    legato = sandbox 'lib/legato.coffee',
+      console: console
+      require: localRequire
 
   it 'should be able to add midi listeners.', ->
     spyOn(rtMidiMock, 'input').andCallThrough()

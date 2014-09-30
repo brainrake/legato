@@ -1,8 +1,11 @@
-# TODO pass in legatoUtils and OMGOSC
+'use strict'
 
-utils = require './legatoUtils'
-___ = utils.____ '[osc]'
-osc = require 'omgosc'
+utils = osc = null
+
+@init = (legatoUtils, omgosc) ->
+  utils = legatoUtils
+  osc = omgosc
+  ___ = utils.____ '[osc]'
 
 @In = (port) ->
   (router) ->

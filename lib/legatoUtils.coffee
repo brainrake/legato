@@ -2,12 +2,11 @@
 
 # Used to create unique ids for inputs.
 inputsCreated = 0
-_ = {}
+_ = null
 
 # Initialize the utilities class
 @init = (lodash) ->
   _ = lodash
-  return true
 
 # Log a list of arguments to the console.
 @___ = ___ = -> console.log '[legato]', arguments...; arguments[0]
@@ -28,7 +27,7 @@ _ = {}
 # @param callback {Function} A function to execute when shutting down (or reinitializing) legato.
 # @param id {int} The id of the shutdown method. If an id is not passed, one will be generated.
 @store = (callback, id) ->
-  id = id ? generateId()
+  id = id ? @generateId()
   @closet[id] = callback
   return id
 
@@ -49,3 +48,5 @@ _ = {}
 
 # Delay invocation of a callback.
 @delay = (time, fn) -> _.delay fn, time
+
+@bind = (cb, options) -> _.bind cb, options

@@ -1,13 +1,12 @@
 'user strict'
 
-# TODO Pass in logger and lodash dependencies
-# TODO Can we remove the legato.store reference? (create a closet class)
-# TODO Remove the logger requirements (pass in logger or duplicate code)
+L = utils = midi = ___ = null
 
-L = require './legato'
-utils = require './legatoUtils'
-___ = utils.____ '[midi]'
-midi = require 'midi'
+@init = (router, legatoUtils, rtMidi) ->
+  L = router
+  utils = legatoUtils
+  midi = rtMidi
+  ___ = utils.____ '[midi]'
 
 parse = (port, msg) ->
   channel = msg[0] % 16 + 1
@@ -52,7 +51,7 @@ parse = (port, msg) ->
   # and why does this call the midi_out.on function?
   midi_out.on 'message', (deltaTime, msg) ->
     router parse(port, msg)...
-  return L.store -> midi_out.closePort(); ___ 'out: close'
+  return utils.store -> midi_out.closePort(); ___ 'out: close'
 
 @ins = ->
   ___ "in: retrieving available ports."
