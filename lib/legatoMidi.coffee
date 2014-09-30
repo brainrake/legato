@@ -1,7 +1,12 @@
 'user strict'
 
-L = require './legato'; ___ = L.____ '[midi]'
-midi = require 'midi'
+L = utils = midi = ___ = null
+
+@init = (router, legatoUtils, rtMidi) ->
+  L = router
+  utils = legatoUtils
+  midi = rtMidi
+  ___ = utils.____ '[midi]'
 
 parse = (port, msg) ->
   channel = msg[0] % 16 + 1
@@ -41,9 +46,12 @@ parse = (port, msg) ->
   ___ "out: #{port}#{virtual and 'v' or ''} open"
   midi_out = new midi.output()
   midi_out["open#{virtual and 'Virtual' or ''}Port"] port
+  # can we store a shutdown function for this output and return the id in the closet and
+  # return the function to send a message.
+  # and why does this call the midi_out.on function?
   midi_out.on 'message', (deltaTime, msg) ->
     router parse(port, msg)...
-  return L.store -> midi_out.closePort(); ___ 'out: close'
+  return utils.store -> midi_out.closePort(); ___ 'out: close'
 
 @ins = ->
   ___ "in: retrieving available ports."

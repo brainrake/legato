@@ -1,4 +1,5 @@
-L = require './legato'; ___ = L.____ '[firmata]'
+utils = require './legatoUtils';
+___ = utils.____ '[firmata]'
 _ = require 'lodash'; Deferred = (require 'underscore.deferred').Deferred
 
 Serial = (port, baud=9600, opts={}) ->
@@ -8,7 +9,7 @@ Serial = (port, baud=9600, opts={}) ->
   loading: (new Deferred())
   board: (new (require 'firmata').Board (Serial port, baud, opts), (err) ->
     o.loading.resolve(); ___ "open", if err then err else ''
-    L.closet.push -> o.board.sp.close() ;___ 'close' )
+    utils.closet.push -> o.board.sp.close() ;___ 'close' )
   Out: (pin, mode, cb) ->
     o.loading.done ->
       ___ 'Out', pin, mode
