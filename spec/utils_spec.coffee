@@ -1,6 +1,5 @@
 'use strict'
 
-#sandbox = require('./utils').sandbox
 _ = require 'lodash'
 
 describe 'legatoUtils', ->
@@ -8,7 +7,7 @@ describe 'legatoUtils', ->
   mock = {}
 
   beforeEach ->
-    legatoUtils = require '../lib/legatoUtils'
+    legatoUtils = require( '../lib/utils' ).utils
     legatoUtils.init _
 
     mock =

@@ -1,11 +1,11 @@
 'use strict'
 
-router = require './legatoRouter'
-utils = require './legatoUtils'
-legatoMidi = require './legatoMidi'
+router = require( './router' )
+utils = require( './utils' )
+legatoMidi = require './midi'
 midi = require 'midi'
 omgosc = require 'omgosc'
-legatoOSC = require './legatoOSC'
+legatoOSC = require './osc'
 _ = require 'lodash'
 
 utils.init _
@@ -32,5 +32,5 @@ legatoOSC.init utils, omgosc
 @removeInput = (id, prefix) ->
   @router.removeInput id, prefix
 
-@dinit = ->
+@deinit = ->
   @router.deinit()

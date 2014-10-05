@@ -1,4 +1,4 @@
-utils = require './legatoUtils';
+utils = require './utils'
 ___ = utils.____ '[firmata]'
 _ = require 'lodash'; Deferred = (require 'underscore.deferred').Deferred
 

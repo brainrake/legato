@@ -9,22 +9,15 @@ describe 'legatoRouter', ->
   mock = {}
 
   beforeEach ->
-    localRequire = (lib) ->
-      if lib is 'lodash'
-        return _
-      if lib is './legatoUtils'
-        return legatoUtils
-      else
-        return require lib
 
-    legatoUtils = sandbox 'lib/legatoUtils.coffee',
+    legatoUtils = sandbox( 'lib/utils.coffee',
       console: console
-      require: localRequire
+    ).utils
     legatoUtils.init _
 
-    legato = sandbox 'lib/legatoRouter.coffee',
+    legato = sandbox( 'lib/router.coffee',
       console: console
-      require: localRequire
+    ).router
     legato.init legatoUtils
 
     mock =

@@ -7,7 +7,7 @@ describe 'legato', ->
   legato = {}
 
   beforeEach ->
-#    spyOn console, 'log' # prevent logs
+    spyOn console, 'log' # prevent logs
 
     localRequire = (lib) ->
       if lib is 'lodash'
@@ -16,13 +16,13 @@ describe 'legato', ->
         return rtMidiMock
       else if lib is './legato'
         return midiLegatoMock
-      else if lib is './legatoUtils'
+      else if lib is './utils'
         return legatoUtils
-      else if lib is './legatoMidi'
+      else if lib is './midi'
         return midi
-      else if lib is './legatoOSC'
+      else if lib is './osc'
         return legatoOSC
-      else if lib is './legatoRouter'
+      else if lib is './router'
         return legatoRouter
       else
         return {}
@@ -35,11 +35,13 @@ describe 'legato', ->
     sandbox 'spec/rtMidiMock.coffee', rtMidiMockGlobals
     rtMidiMock = rtMidiMockGlobals.exports.rtMidiMock
 
-    legatoUtils = sandbox 'lib/legatoUtils.coffee',
+    legatoUtils = sandbox( 'lib/utils.coffee',
       console: console
+    ).utils
 
-    legatoRouter = sandbox 'lib/legatoRouter.coffee',
+    legatoRouter = sandbox( 'lib/router.coffee',
       console: console
+    ).router
 
     midiLegatoMock =
       ____: -> ->
@@ -47,13 +49,11 @@ describe 'legato', ->
       store: ->
         return true
 
-    midi = sandbox 'lib/legatoMidi.coffee',
+    midi = sandbox 'lib/midi.coffee',
       console: console
-      require: localRequire
 
-    legatoOSC = sandbox 'lib/legatoOSC.coffee',
+    legatoOSC = sandbox 'lib/osc.coffee',
       console: console
-      require: localRequire
 
     legato = sandbox 'lib/legato.coffee',
       console: console
