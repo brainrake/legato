@@ -1,24 +1,24 @@
 'use strict'
 
-router = require( './router' )
-utils = require( './utils' )
+router = require( './router' ).router
+utils = require( './utils' ).utils
 legatoMidi = require './midi'
 midi = require 'midi'
 omgosc = require 'omgosc'
 legatoOSC = require './osc'
 _ = require 'lodash'
 
-utils.init _
-router.init utils
-legatoMidi.init router, utils, midi
-legatoOSC.init utils, omgosc
+utils.inject _
+router.inject utils
+legatoMidi.inject router, utils, midi
+legatoOSC.inject utils, omgosc
 
 @midi = legatoMidi
 @osc = legatoOSC
 # TODO Provide access to firmata and amixer
 
 @init = ->
-  utils.reinit()
+  router.init()
 
 @in = (prefix, input) ->
   return router.in prefix, input

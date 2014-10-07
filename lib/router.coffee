@@ -4,10 +4,10 @@ class Router
 
   utils = null
 
-  @init = (legatoUtils) ->
+  @inject = (legatoUtils) ->
     utils = legatoUtils
 
-  @reinit = ->
+  @init = ->
     @deinit()
     utils.___ 'init'
     return this

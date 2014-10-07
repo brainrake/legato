@@ -8,7 +8,7 @@ describe 'legatoUtils', ->
 
   beforeEach ->
     legatoUtils = require( '../lib/utils' ).utils
-    legatoUtils.init _
+    legatoUtils.inject _
 
     mock =
       callback: ->

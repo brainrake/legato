@@ -37,11 +37,11 @@ describe 'legato', ->
 
     legatoUtils = sandbox( 'lib/utils.coffee',
       console: console
-    ).utils
+    )
 
     legatoRouter = sandbox( 'lib/router.coffee',
       console: console
-    ).router
+    )
 
     midiLegatoMock =
       ____: -> ->

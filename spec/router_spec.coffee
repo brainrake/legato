@@ -13,12 +13,12 @@ describe 'legatoRouter', ->
     legatoUtils = sandbox( 'lib/utils.coffee',
       console: console
     ).utils
-    legatoUtils.init _
+    legatoUtils.inject _
 
     legato = sandbox( 'lib/router.coffee',
       console: console
     ).router
-    legato.init legatoUtils
+    legato.inject legatoUtils
 
     mock =
       callback: ->
@@ -57,7 +57,7 @@ describe 'legatoRouter', ->
 
     expect(Object.keys(legatoUtils.closet).length).toBe 2, 'The closet should contain both callbacks.'
 
-    returned = legato.reinit()
+    returned = legato.init()
 
     expect(mock.callback).toHaveBeenCalled()
     expect(mock.otherCallback).toHaveBeenCalled()

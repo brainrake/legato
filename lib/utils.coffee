@@ -7,7 +7,7 @@ class Utils
   _ = null
 
   # Initialize the utilities class
-  @init = (lodash) ->
+  @inject = (lodash) ->
     _ = lodash
 
   # Log a list of arguments to the console.

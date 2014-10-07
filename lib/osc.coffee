@@ -2,7 +2,7 @@
 
 utils = osc = null
 
-@init = (legatoUtils, omgosc) ->
+@inject = (legatoUtils, omgosc) ->
   utils = legatoUtils
   osc = omgosc
   ___ = utils.____ '[osc]'

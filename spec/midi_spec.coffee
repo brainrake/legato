@@ -1,6 +1,7 @@
 'use strict'
 
 sandbox = require('./utils').sandbox
+_ = require 'lodash'
 rtMidiMock = {}
 
 describe 'legato.midi', ->
@@ -20,15 +21,16 @@ describe 'legato.midi', ->
     utils = sandbox( 'lib/utils.coffee',
       console: console
     ).utils
+    utils.inject _
 
     router = sandbox( 'lib/router.coffee',
       console: console
     ).router
-    router.init utils
+    router.inject utils
 
     midi = sandbox 'lib/midi.coffee',
       console: console
-    midi.init router, utils, rtMidiMock
+    midi.inject router, utils, rtMidiMock
 
     spyOn console, 'log' # prevent logging
 
@@ -75,7 +77,7 @@ describe 'legato.midi', ->
 
     expect(rtMidiMock.inputs[0].closePort).not.toHaveBeenCalled()
 
-    router.reinit()
+    router.init()
 
     expect(rtMidiMock.inputs[0].closePort).toHaveBeenCalled()
 

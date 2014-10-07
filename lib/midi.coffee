@@ -2,7 +2,7 @@
 
 L = utils = midi = ___ = null
 
-@init = (router, legatoUtils, rtMidi) ->
+@inject = (router, legatoUtils, rtMidi) ->
   L = router
   utils = legatoUtils
   midi = rtMidi
