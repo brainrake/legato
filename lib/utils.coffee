@@ -33,6 +33,11 @@ class Utils
     @closet[id] = callback
     return id
 
+  @close = (id) ->
+    @closet[id]()
+    @remove(id)
+    return true
+
   @remove = (id) ->
     delete @closet[id]
     return true

@@ -83,13 +83,13 @@ class Router
   #     then routes associated to that prefix will remain (which may be desired in some cases).
   @removeInput = (id, prefix) ->
     utils.___ 'in- ', id, prefix
-    for routeId, [route, cb] of @routes
+    for routeId, [route, cb] of routes
       if route.indexOf("^#{id}") is 0
         @removeRoute routeId
       if prefix? && route.indexOf("^#{prefix}") is 0
         @removeRoute routeId
     # TODO call the shutdown mentod for this input.
-    utils.remove id
+    utils.close id
 
   # Remove any registered midi and osc port listeners.
   # TODO Is it ok to remove this method from the global scope? Should I put it back in the global space
