@@ -1,6 +1,6 @@
 'use strict'
 
-utils = osc = null
+utils = osc = ___ = null
 
 @inject = (legatoUtils, omgosc) ->
   utils = legatoUtils

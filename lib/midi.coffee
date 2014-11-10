@@ -35,7 +35,9 @@ parse = (port, msg) ->
 @In = (port, virtual=no) ->
   (router) ->
     ___ "in: #{port}#{virtual and 'v' or ''} open"
-    midi_in = new midi.input()
+    if !(midi_in?)
+      midi_in = new midi.input()
+    
     # TODO Should we guard against opening virtual ports on systems that don't provide them?
     midi_in["open#{virtual and 'Virtual' or ''}Port"] port
     midi_in.on 'message', (deltaTime, msg) ->
@@ -55,7 +57,9 @@ parse = (port, msg) ->
 
 @ins = ->
   ___ "in: retrieving available ports."
-  midi_in = new midi.input()
+  if !(midi_in?)
+    midi_in = new midi.input()
+
   for i in [0...midi_in.getPortCount()]
     midi_in.getPortName i
 
