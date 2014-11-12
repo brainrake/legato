@@ -1,6 +1,6 @@
 'user strict'
 
-L = utils = midi = ___ = null
+L = utils = midi = midi_in = ___ = null
 
 @inject = (router, legatoUtils, rtMidi) ->
   L = router
@@ -35,7 +35,7 @@ parse = (port, msg) ->
 @In = (port, virtual=no) ->
   (router) ->
     ___ "in: #{port}#{virtual and 'v' or ''} open"
-    if !(midi_in?)
+    unless midi_in?
       midi_in = new midi.input()
     
     # TODO Should we guard against opening virtual ports on systems that don't provide them?
@@ -57,7 +57,7 @@ parse = (port, msg) ->
 
 @ins = ->
   ___ "in: retrieving available ports."
-  if !(midi_in?)
+  unless midi_in?
     midi_in = new midi.input()
 
   for i in [0...midi_in.getPortCount()]
