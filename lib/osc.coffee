@@ -12,6 +12,6 @@ osc = require 'omgosc'
 @Out = (host, port, opts={}) ->
   ___ "out #{host}:#{port}"
   sender = new osc.UdpSender host, port, opts
-  (path, val) ->  # send a float
+  (path, val) ->
     #___ "out #{host}:#{port}", path, val
-    sender.send path, 'f', [val]
+    sender.send path, val.types, val.values
