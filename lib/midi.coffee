@@ -35,9 +35,11 @@ parse = (port, msg) ->
 @In = (port, virtual=no) ->
   (router) ->
     ___ "in: #{port}#{virtual and 'v' or ''} open"
+    # TODO Should be able to open multiple midi ports (can only open one at the moment
+    # due to a defect with node-midi. Remember that we'll only need one midi instance per port.
     unless midi_in?
       midi_in = new midi.input()
-    
+
     # TODO Should we guard against opening virtual ports on systems that don't provide them?
     midi_in["open#{virtual and 'Virtual' or ''}Port"] port
     midi_in.on 'message', (deltaTime, msg) ->
