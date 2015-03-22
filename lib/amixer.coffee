@@ -1,4 +1,4 @@
-___ = (require './legato').___
+___ = (require './utils').___
 spawn = (require 'child_process').spawn
 
 @Out = (card=0, control='PCM') ->
