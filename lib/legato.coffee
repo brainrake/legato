@@ -27,10 +27,10 @@ legatoOSC.inject utils, omgosc
   return router.on path, callback
 
 @removeRoute = (id) ->
-  @router.removeRoute id
+  router.removeRoute id
 
 @removeInput = (id, prefix) ->
-  @router.removeInput id, prefix
+  router.removeInput id, prefix
 
 @deinit = ->
-  @router.deinit()
+  router.deinit()
