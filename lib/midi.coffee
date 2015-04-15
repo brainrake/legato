@@ -8,19 +8,36 @@ L = utils = midi = midi_in = ___ = null
   midi = rtMidi
   ___ = utils.____ '[midi]'
 
+# Parse method copied from https://github.com/hhromic/midi-utils-js/blob/master/midiparser.js#L418
 parse = (port, msg) ->
-  channel = msg[0] % 16 + 1
-  switch msg[0] / 16  # message type
-    when 0xB
-      ["/#{channel}/cc/#{msg[1]}", msg[2]/127.0]
-    when 0x9  # note on
-      ["/#{channel}/note/#{msg[1]}", msg[2]/127.0]
-    when 0x8  # note off
-      ["/#{channel}/note/#{msg[1]}", 0]
-    when 0xE
-      ["/#{channel}/pitchbend/", msg[1]/127.0]
+  type = msg[0] & 0xF0
+  channel = msg[0] & 0x0F
+  switch type
+    when 0xB0
+      note = msg[1] & 0x7F
+      velocity = (msg[2] & 0x7F)/127.0
+      ["/#{channel}/cc/#{note}", velocity]
+    when 0x90
+      note = msg[1] & 0x7F
+      velocity = (msg[2] & 0x7F)/127.0
+      ["/#{channel}/note/#{note}", velocity]
+    when 0x80
+      note = msg[1] & 0x7F
+      ["/#{channel}/note/#{note}", 0]
+    when 0xE0
+      value = (msg[1] & 0x7F)/127.0
+      ["/#{channel}/pitch-bend/", value]
+    when 0xA0
+      pressure = (msg[1] & 0x7F)/127.0
+      ["/#{channel}/key-pressure/", pressure]
+    when 0xC0
+      number = bytes[1] & 0x7F
+      ["/#{channel}/program-change/#{number}", 0 ]
+    when 0xD0
+      pressure = bytes[1] & 0x7F
+      ["/#{channel}/channel-pressure/#{pressure}", 0]
     else
-      ___ undefined, 'message:', msg...
+      ___ 'unknown message:', msg...
 
 
 # Returns a function that can be called to start listening on a midi port.
