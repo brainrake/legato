@@ -97,11 +97,21 @@ describe 'legato.midi', ->
     expect(rtMidiMock.outputs[1].openVirtualPort).toHaveBeenCalled()
     expect(id1).not.toEqual id2, 'The two ouput ids should be unique.'
 
-#  it 'should close its output port when legato is closed.', ->
-#    legatoMidi.Out 'output1'
-#
-#    expect(rtMidiMock.outputs[0].closePort).not.toHaveBeenCalled()
+  it 'should correctly parse midi messages.', ->
+    mock = {
+      mockCallback: (path, value) -> console.log path, value
+    }
+    spyOn mock, 'mockCallback'
 
-#    legato.init()
+    midiRegister = midi.In('port1')
+    midiRegister( mock.mockCallback )
 
-#    expect(rtMidiMock.outputs[0].closePort).toHaveBeenCalled()
+    rtMidiMock.inputs[0].messageCallbacks[0](0, [153, 44, 103])
+
+    expect(mock.mockCallback).toHaveBeenCalledWith '/9/note/44', 103/127
+
+    rtMidiMock.inputs[0].messageCallbacks[0](0, [144, 62, 120])
+
+    expect(mock.mockCallback.calls.length).toBe 2
+    expect(mock.mockCallback.calls[1].args).toEqual ['/0/note/62', 120/127]
+
