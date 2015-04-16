@@ -1,30 +1,38 @@
 {
   "name": "legato",
-  "version": "0.2.0",
+  "version": "0.2.1",
+  "main": "lib/legato.coffee",
   "description": "osc/midi hub",
-  "main": "legato.coffee",
-  "dependencies": {
-    "coffee-script": "*",
-    "lodash": "~1.0.0-rc.3"
-  },
-  "devDependencies": {
-    "midi": "~0.6.0",
-    "omgosc": "git://github.com/brainrape/omgosc.git",
-    "firmata": "git://github.com/louisremi/firmata.git",
-    "underscore.deferred": "0.4.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/brainrape/legato.git"
-  },
+  "homepage": "https://github.com/brainrape/legato",
+  "bugs": "https://github.com/brainrape/legato/issues",
   "keywords": [
     "osc",
     "midi"
   ],
   "author": "brainrape",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/brainrape/legato.git"
+  },
   "license": "Public Domain",
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt-jasmine-node": "~0.1.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-coffeelint": "0.0.7",
+    "grunt-contrib-coffee": "~0.7.0",
+    "load-grunt-tasks": "~0.2.0",
+    "grunt": "~0.4.1"
+  },
+  "dependencies": {
+    "lodash": "~2.3.0",
+    "midi": "~0.9.0",
+    "omgosc": "~1.0.0",
+    "firmata": "~0.3.0",
+    "underscore.deferred": "~0.4.0",
+    "coffee-script": "~1.6.3"
+  },
+  "scripts": {
+    "test": "grunt test"
+  }
 }

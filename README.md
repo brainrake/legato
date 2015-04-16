@@ -59,3 +59,17 @@ Here's an example:
 `legato` is livecoding-friendly. Run your instance with coffeescript's 'watch' mode and watch it reload when you save the file.
 
     $ coffee -w mapping.coffee
+
+
+Development
+-----------
+
+If you want to make changes to legato, you can build the project as follows:
+
+    // npm install NodeJS dependencies
+    > npm install
+    // install grunt-cli
+    > npm install -g grunt-cli
+
+    // build and test the project
+    > grunt
