@@ -41,20 +41,21 @@ Create a directory for your project and install legato as a dependency:
 
 Create and edit a mapping file, e.g. `mapping.coffee`. You can also use JS if you really want to.
 Here's an example:
+```coffee
+L = require('legato').init()
 
-    L = require('legato').init()
+L.in '/midi1', L.midi.in 1  
 
-    L.in '/midi1', L.midi.in 1  
+oscout = L.osc.out '192.168.1.255', 7778, broadcast: on 
 
-    oscout = L.osc.out '192.168.1.255', 7778, broadcast: on 
+L.on '/midi1/1/cc/1', ->             # listen for MIDI CC 1 on channel 1
+  console.log 'CC1', @val            # log the value
 
-    L.on '/midi1/1/cc/1', ->             # listen for MIDI CC 1 on channel 1
-      console.log 'CC1', @val            # log the value
+L.on '/midi1/:/note/:', ->           # listen for all MIDI notes on any channel
+  oscout @path, @val                 # forward them to OSC
 
-    L.on '/midi1/:/note/:', ->           # listen for all MIDI notes on any channel
-      oscout @path, @val                 # forward them to OSC
-
-    L.on '', -> console.log @path, @val  # log all events
+L.on '', -> console.log @path, @val  # log all events
+```
 
 `legato` is livecoding-friendly. Run your instance with coffeescript's 'watch' mode and watch it reload when you save the file.
 
